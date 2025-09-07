@@ -1,30 +1,67 @@
-local entity = table.deepcopy(data.raw["constant-combinator"])
-entity.type = "constant-combinator"
-entity.name = "VT-advanced-group-emitter"
-entity.collision_box = {{-0.35, -0.35}, {0.35, 0.35}}
-entity.selection_box = {{-0.5, -0.5}, {0.5, 0.5}}
-entity.minable = {mining_time = 0.1, results = {{type = "item", name = "VT-advanced-group-emitter", amount = 1}}}
-entity.collision_mask = {layers = {item = true, meltable = true, object = true, player = true, water_tile = true, is_object = true, is_lower_object = true}}
-entity.flags = {"placeable-neutral", "player-creation", "not-flammable"}
-entity.icon = data.raw["constant-combinator"]["constant-combinator"].icon
-entity.sprites = data.raw["constant-combinator"]["constant-combinator"].sprites
-entity.activity_led_light_offsets = data.raw["constant-combinator"]["constant-combinator"].activity_led_light_offsets
-entity.activity_led_sprites = data.raw["constant-combinator"]["constant-combinator"].activity_led_sprites
-entity.circuit_wire_connection_points = data.raw["constant-combinator"]["constant-combinator"].circuit_wire_connection_points
-entity.circuit_wire_max_distance = data.raw["constant-combinator"]["constant-combinator"].circuit_wire_max_distance
+local constants = require "scripts.constants"
+local flib_data_util = require "__flib__.data-util"
 
-data:extend({entity})
+local name = constants.ENTITY_NAME
+local combi = flib_data_util.copy_prototype(data.raw["constant-combinator"]["constant-combinator"], name)
+combi.icon = "__vt-advanced-group-emitter__/graphics/icons/vt-advanced-group-emitter.png"
+combi.icon_size = 64
+combi.next_upgrade = nil
+combi.fast_replaceable_group = "constant-combinator"
+combi.sprites = make_4way_animation_from_spritesheet {
+  layers = {
+    {
+      filename = "__vt-advanced-group-emitter__/graphics/entity/combinator/vt-advanced-group-emitter.png",
+      scale = 1,
+      width = 224, -- 7 tiles * 32px
+      height = 224, -- 7 tiles * 32px
+      shift = util.by_pixel(0, 0)
+    },
+    {
+      filename = "__base__/graphics/entity/combinator/constant-combinator-shadow.png",
+      scale = 1,
+      width = 224,
+      height = 224,
+      shift = util.by_pixel(8.5, 5.5),
+      draw_as_shadow = true
+    }
+  }
+}
 
-local item = table.deepcopy(data.raw["item"]["constant-combinator"])
-item.name = "VT-advanced-group-emitter"
-item.place_result = "VT-advanced-group-emitter"
-item.subgroup = "circuit-network"
-item.order = "c[combinators]-d[VT-advanced-group-emitter]"
-data:extend({item})
+local combi_item = flib_data_util.copy_prototype(data.raw.item["constant-combinator"], name)
+combi_item.icon = "__vt-advanced-group-emitter__/graphics/icons/vt-advanced-group-emitter.png"
+combi_item.icon_size = 64
+combi_item.subgroup = "logistic-network"
+combi_item.place_result = name
 
-local recipe = table.deepcopy(data.raw["recipe"]["constant-combinator"])
-recipe.name = "VT-advanced-group-emitter"
-recipe.enabled = true
-recipe.subgroup = "circuit-network"
-recipe.results = {{type = "item", name = "VT-advanced-group-emitter", amount = 1}}
-data:extend({recipe})
+local combi_recipe = flib_data_util.copy_prototype(data.raw.recipe["constant-combinator"], name)
+combi_recipe.ingredients = {
+  { type = "item", name = "radar", amount = 2 },
+  { type = "item", name = "processing-unit", amount = 10 }
+}
+combi_recipe.enabled = false
+combi_recipe.subgroup = "logistic-network"
+
+if mods["nullius"] then
+  combi.localised_name = { "entity-name." .. name }
+  combi.minable.mining_time = 1
+  combi_item.order = "nullius-eca-b"
+  combi_item.localised_name = { "item-name." .. name }
+  combi_recipe.order = "nullius-eca-b"
+  combi_recipe.localised_name = { "recipe-name." .. name }
+  combi_recipe.category = "tiny-crafting"
+  combi_recipe.always_show_made_in = true
+  combi_recipe.energy_required = 2
+  combi_recipe.ingredients = {
+    { "constant-combinator", 1 },
+    { "decider-combinator", 1 }
+  }
+else
+  combi_item.order = data.raw.item["constant-combinator"].order .. "-b"
+  combi_recipe.order = data.raw.recipe["constant-combinator"].order .. "-b"
+end
+
+data:extend {
+  combi,
+  combi_item,
+  combi_recipe
+}
