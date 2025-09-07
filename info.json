@@ -1,0 +1,11 @@
+{
+  "name": "VT-advanced-group-emitter",
+  "version": "2.0.1",
+  "title": "VT Advanced Group Emitter",
+  "author": "Vitauh",
+  "contact": "",
+  "homepage": "",
+  "description": "Adds an advanced group emitter combinator to set logistic groups with a circuit network signal.",
+  "factorio_version": "2.0",
+  "dependencies": ["base >= 2.0.0", "?space-age"]
+}
